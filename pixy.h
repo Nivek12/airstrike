@@ -108,6 +108,8 @@ uint16_t getWord()
   uint16_t w;
   uint8_t c, cout = 0;
 
+  enablePixyCS(g_CameraSelect);
+
   if (g_outLen)
   {
     w = getByte(PIXY_SYNC_BYTE_DATA);
@@ -121,6 +123,12 @@ uint16_t getWord()
   w <<= 8;
   c = getByte(cout); // send out data byte
   w |= c;
+
+  disablePixyCS(g_CameraSelect);
+
+  char str_test[15];
+  sprintf(str_test, "%X", w);
+  puts(str_test);
 
   return w;
 }

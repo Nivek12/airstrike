@@ -22,50 +22,60 @@
 #include "spi.h"
 
 #define SPI_IF_BIT_RATE  1000000
-#define ONE_CAM
 #define MAX_BLOCKS       100
 #define CAM_A            0
 #define CAM_B            1
-#define PIN_8_to_GPIO    0x2
-#define PIN_4_to_GPIO    0x20
+#define CAM_A_CS         GPIO_PIN_5
+#define CAM_B_CS         GPIO_PIN_4
 
-uint8_t g_currentCamera = CAM_A;
-
-void enableCS(uint8_t cam) {
-	switch (cam) {
-		case CAM_A:
-			MAP_GPIOPinWrite(GPIOA1_BASE, PIN_4_to_GPIO, 0x0);
-			break;
-		case CAM_B:
-			MAP_GPIOPinWrite(GPIOA2_BASE, PIN_8_to_GPIO, 0x0);
-			break;
-	}
-}
-
-void disableCS(uint8_t cam) {
-	switch (cam) {
-		case CAM_A:
-			MAP_GPIOPinWrite(GPIOA1_BASE, PIN_4_to_GPIO, PIN_4_to_GPIO);
-			break;
-		case CAM_B:
-			MAP_GPIOPinWrite(GPIOA2_BASE, PIN_8_to_GPIO, PIN_8_to_GPIO);
-			break;
-		}
-}
+uint8_t g_CameraSelect = CAM_A;
 
 uint8_t getByte(uint8_t out) {
-	uint8_t w = 0;
+	unsigned long w = 0;
 
-	//enableCS(g_currentCamera);
+	MAP_SPIDataPut(GSPI_BASE, out);
+	MAP_SPIDataGet(GSPI_BASE, &w);
 
-	MAP_SPITransfer(GSPI_BASE, &out, &w, 1, 0);
+	uint8_t r = 0;
 
-	//disableCS(g_currentCamera);
+	r |= ((w) & 0xFF);
 
-	return w;
+	return r;
+}
+
+void enablePixyCS(uint8_t cam) {
+
+	switch (cam)
+	{
+		case CAM_A:
+			MAP_GPIOPinWrite(GPIOA1_BASE, CAM_A_CS, 0);
+			break;
+		case CAM_B:
+			MAP_GPIOPinWrite(GPIOA1_BASE, CAM_B_CS, 0);
+			break;
+	}
+
+}
+
+void disablePixyCS(uint8_t cam) {
+
+	switch (cam)
+		{
+			case CAM_A:
+				MAP_GPIOPinWrite(GPIOA1_BASE, CAM_A_CS, CAM_A_CS);
+				break;
+			case CAM_B:
+				MAP_GPIOPinWrite(GPIOA1_BASE, CAM_B_CS, CAM_B_CS);
+				break;
+		}
+
 }
 
 void InitSPIModule(void) {
+
+	disablePixyCS(CAM_A);
+	disablePixyCS(CAM_B);
+
 	//
 	// Reset SPI
 	//
@@ -76,13 +86,11 @@ void InitSPIModule(void) {
 	//
 	MAP_SPIConfigSetExpClk(GSPI_BASE,MAP_PRCMPeripheralClockGet(PRCM_GSPI),
 					 SPI_IF_BIT_RATE,SPI_MODE_MASTER,SPI_SUB_MODE_0,
-					 (
-					 SPI_3PIN_MODE    |
+					 (SPI_HW_CTRL_CS  |
+					 SPI_4PIN_MODE    |
 					 SPI_TURBO_OFF    |
+					 SPI_CS_ACTIVELOW |
 					 SPI_WL_8));
-
-	//disableCS(CAM_A);
-	//disableCS(CAM_B);
 
 	//
 	// Enable SPI for communication

@@ -19,11 +19,17 @@ void InitTargetModule(void) {
 
 uint8_t TargetMainLoopTask(void)
 {
-#ifdef ONE_CAM
-	//enableCS(g_currentCamera);
-	uint16_t numBlocks = getBlocks(MAX_BLOCKS);
-	//disableCS(g_currentCamera);
-#endif
+	uint16_t numBlocks = 0;
+	g_CameraSelect = CAM_A;
+
+	puts("\nGetting CAM A Data\n");
+
+	numBlocks = getBlocks(MAX_BLOCKS);
+	//g_CameraSelect = CAM_B;
+
+	//puts("\nGetting CAM B Data\n");
+
+	//numBlocks = getBlocks(MAX_BLOCKS);
 
 	return numBlocks;
 }

@@ -71,15 +71,9 @@ int main(void) {
 
 	//PWM testing
 	UpdateDutyCycle(TIMERA2_BASE, TIMER_B, 100);
-	uint16_t i = 0;
 	while(1)
 	{
 		_SlNonOsMainLoopTask();
-		i = TargetMainLoopTask();
-		if (i > 0)
-		{
-			uint8_t o = i+1;
-		}
-		//printf("count is %d\n", count++);
+		TargetMainLoopTask();
 	}
 }

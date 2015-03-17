@@ -36,7 +36,7 @@
 //
 //*****************************************************************************
 
-// This file was automatically generated on 3/14/2015 at 12:22:29 PM
+// This file was automatically generated on 3/17/2015 at 11:40:26 AM
 // by TI PinMux version 3.0.625 
 //
 //*****************************************************************************
@@ -60,7 +60,6 @@ void PinMuxConfig(void)
     MAP_PRCMPeripheralClkEnable(PRCM_ADC, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GSPI, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_GPIOA1, PRCM_RUN_MODE_CLK);
-    MAP_PRCMPeripheralClkEnable(PRCM_GPIOA2, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_TIMERA2, PRCM_RUN_MODE_CLK);
     MAP_PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
 
@@ -90,16 +89,16 @@ void PinMuxConfig(void)
     MAP_PinTypeSPI(PIN_07, PIN_MODE_7);
 
     //
+    // Configure PIN_03 for GPIO Output
+    //
+    MAP_PinTypeGPIO(PIN_03, PIN_MODE_0, false);
+    MAP_GPIODirModeSet(GPIOA1_BASE, 0x10, GPIO_DIR_MODE_OUT);
+
+    //
     // Configure PIN_04 for GPIO Output
     //
     MAP_PinTypeGPIO(PIN_04, PIN_MODE_0, false);
     MAP_GPIODirModeSet(GPIOA1_BASE, 0x20, GPIO_DIR_MODE_OUT);
-
-    //
-    // Configure PIN_08 for GPIO Output
-    //
-    MAP_PinTypeGPIO(PIN_08, PIN_MODE_0, false);
-    MAP_GPIODirModeSet(GPIOA2_BASE, 0x2, GPIO_DIR_MODE_OUT);
 
     //
     // Configure PIN_64 for TimerPWM5 GT_PWM05
