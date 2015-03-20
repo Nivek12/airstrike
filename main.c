@@ -69,11 +69,18 @@ int main(void) {
 	InitTargetModule();
 	HTTPServerInit();
 
-	//PWM testing
-	UpdateDutyCycle(TIMERA2_BASE, TIMER_B, 100);
+	uint16_t pulse_us = 800;
+
 	while(1)
 	{
 		_SlNonOsMainLoopTask();
-		TargetMainLoopTask();
+		//TargetMainLoopTask();
+
+		if(pulse_us == 2200)
+			pulse_us = 800;
+
+		 UpdateDutyCycle(TIMERA2_BASE, TIMER_B, pulse_us++);
+		 printf("%d\n", pulse_us);
+		 MAP_UtilsDelay(80000);
 	}
 }

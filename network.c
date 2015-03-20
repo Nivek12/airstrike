@@ -85,7 +85,6 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
 void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
                                SlHttpServerResponse_t *pSlHttpServerResponse)
 {
-    printf("TOKEN SWITCH\n");
     if(!pSlHttpServerEvent || !pSlHttpServerResponse)
     {
         return;
@@ -95,17 +94,25 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 	{
 		case SL_NETAPP_HTTPGETTOKENVALUE_EVENT:
 		{
-			printf("TOKEN GET\n");
 
 			//ptr = pSlHttpServerResponse->ResponseData.token_value.data;
 			pSlHttpServerResponse->ResponseData.token_value.len = 0;
 			if(memcmp(pSlHttpServerEvent->EventData.httpTokenName.data,
 					GET_token, strlen((const char *)GET_token)) == 0)
 			{
-				//char str[30];
-				//sprintf(str, "DAMMIT CHRIS %d", mCount++);
-                strcpy((char*)pSlHttpServerResponse->ResponseData.token_value.data, "PENIS");
-                pSlHttpServerResponse->ResponseData.token_value.len += strlen("PENIS");
+				char message[20];
+
+				if(foundTarget())
+				{
+					getFaggotBlocksForKevinTheFag(message);
+				}
+				else
+				{
+					strcpy(message, "none");
+				}
+
+				strcpy((char*)pSlHttpServerResponse->ResponseData.token_value.data, message);
+				pSlHttpServerResponse->ResponseData.token_value.len += strlen(message);
 			}
 		}
 

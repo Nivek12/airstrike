@@ -24,8 +24,15 @@
 //      New time period = 0.5004375 ms
 //      Timer match value = (update[0, 255] * duty cycle granularity)
 //
-#define TIMER_INTERVAL_RELOAD   40035 /* =(255*157) */
-#define DUTYCYCLE_GRANULARITY   157 //Lower this for more accurate timing
+#define PRESCALE 25	//20ms period
+#define TIMER_INTERVAL_RELOAD   65535 /* =(255*157) */
+#define DUTYCYCLE_GRANULARITY   257 //Lower this for more accurate timing
+
+#define CC3200_CLOCK_RATE 	80000000
+#define TICS_US 			CC3200_CLOCK_RATE / 1000000
+#define DEFAULT_PULSE 		0
+#define REFRESH_RATE 		50 //For 20ms periods = 50Hz
+
 
 //****************************************************************************
 //
@@ -41,13 +48,17 @@
 //! \return None.
 //
 //****************************************************************************
-void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer,
-                     unsigned char ucLevel)
+void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer, unsigned int pulse_us)
 {
     //
     // Match value is updated to reflect the new dutycycle settings
     //
-    MAP_TimerMatchSet(ulBase,ulTimer,(ucLevel*DUTYCYCLE_GRANULARITY));
+	uint32_t period = TICS_US*pulse_us;
+	uint8_t extender = period >> 16;
+	period &= 0xFFFF;
+
+    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, extender);
+    MAP_TimerMatchSet(ulBase,ulTimer, period);
 }
 
 //****************************************************************************
@@ -68,11 +79,24 @@ void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer,
 void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
                        unsigned long ulConfig, unsigned char ucInvert)
 {
+
+
+
+    // set refresh rate
+    uint32_t period1 = CC3200_CLOCK_RATE / REFRESH_RATE; /*Hz*/
+    uint8_t extender1 = period1 >> 16;
+    period1 &= 0xFFFF;
+
+   	//Set default
+	uint32_t period2 = TICS_US*DEFAULT_PULSE;
+	uint8_t extender2 = period2 >> 16;
+	period2 &= 0xFFFF;
+
     //
     // Set GPT - Configured Timer in PWM mode.
     //
     MAP_TimerConfigure(ulBase,ulConfig);
-    MAP_TimerPrescaleSet(ulBase,ulTimer,0);
+    MAP_TimerPrescaleSet(ulBase,ulTimer, extender1);
 
     //
     // Inverting the timer output if required
@@ -80,14 +104,15 @@ void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
     MAP_TimerControlLevel(ulBase,ulTimer,ucInvert);
 
     //
-    // Load value set to ~0.5 ms time period
+    // Load value set to 20 ms time period
     //
-    MAP_TimerLoadSet(ulBase,ulTimer,TIMER_INTERVAL_RELOAD);
+    MAP_TimerLoadSet(ulBase,ulTimer,period1);
 
     //
     // Match value set so as to output level 0
     //
-    MAP_TimerMatchSet(ulBase,ulTimer,TIMER_INTERVAL_RELOAD);
+    MAP_TimerPrescaleMatchSet(ulBase, ulTimer, extender2);
+    MAP_TimerMatchSet(ulBase,ulTimer, period2);
 
 }
 
@@ -118,6 +143,7 @@ void InitPWMModules()
     //
     SetupTimerPWMMode(TIMERA2_BASE, TIMER_B,
             (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PWM), 1);
+
     //
     // TIMERA3 (TIMER B) as YELLOW of RGB light. GPIO 10 --> PWM_6
     //
@@ -132,6 +158,7 @@ void InitPWMModules()
     MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_A);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_B);
+
 }
 
 //****************************************************************************

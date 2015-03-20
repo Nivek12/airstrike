@@ -14,6 +14,8 @@
 #include "common.h"
 #include "simplelink.h"
 
+#include "target.h"
+
 static long ConfigureSimplelinkToAP();
 void HTTPServerInit();
 static unsigned short itoa(char cNum, char *cString);

@@ -8,6 +8,7 @@
 #ifndef PWM_H_
 #define PWM_H_
 
+#include <stdint.h>
 #include "hw_types.h"
 #include "hw_ints.h"
 #include "hw_memmap.h"
@@ -20,8 +21,7 @@
 #include "utils.h"
 #include "prcm.h"
 
-
-void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer, unsigned char ucLevel);
+void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer, unsigned int pulse_ms);
 void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer, unsigned long ulConfig, unsigned char ucInvert);
 void InitPWMModules();
 

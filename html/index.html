@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset=utf-8>
-    <title>CHRIS SIMULATOR</title>
+    <title>AIRSTRIKE TARGETS</title>
 	
     <style>
 		body
@@ -20,35 +20,16 @@
   </head>
   <body>
     <header>
-      <h1>CHRIS CHAT SIMULATOR 2015</h1>
+      <h1>AIRSTRIKE TARGETS</h1>
     </header>
 	
-	<div id="testText">
-	
-	</div>
+	<canvas id="myCanvas" width="320" height="200">
+		Your browser does not support the canvas object
+	</canvas>
 	
 	<script type="text/JavaScript" src="jquery-1.11.2.min.js"></script>
 	<script type="text/JavaScript" src="com.TI.tokenPoller.js"></script>
+	<script type="text/JavaScript" src="index.js"></script>
 	
-	<script type="text/JavaScript">
-	$(function() {
-	var testText = $('#testText'),
-		demoPolling = new com.TI.tokenPoller({
-			"paramPage": "param_airstrike.html", 
-			"refreshRate": 200,	// every half second
-			"valueMap": [{
-			"paramId": "Test_Text",
-				"outputSuccess": function(output) {
-					var tempText = testText.html();
-					testText.html(tempText + " " + output + "<br>");
-				},
-				"outputDefault": function() {
-					var tempText = testText.html();
-					testText.html( tempText + "failed");
-				}
-			}]
-		});
-	});
-	</script>
   </body>	
 </html>
