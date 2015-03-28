@@ -10,6 +10,7 @@
 #include "pwm.h"
 #include "target.h"
 #include "servos.h"
+#include "laser.h"
 
 //Driverlib includes
 #include "hw_types.h"
