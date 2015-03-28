@@ -64,13 +64,18 @@ void InitSPIModule(void) {
 	// Configure SPI interface
 	//
 	MAP_SPIConfigSetExpClk(GSPI_BASE,MAP_PRCMPeripheralClockGet(PRCM_GSPI),
-					 SPI_IF_BIT_RATE,SPI_MODE_MASTER,SPI_SUB_MODE_0,
-					 (SPI_HW_CTRL_CS  |
-					 SPI_4PIN_MODE    |
-					 SPI_TURBO_OFF    |
-					 SPI_CS_ACTIVELOW |
-					 SPI_WL_8));
+					 SPI_IF_BIT_RATE,SPI_MODE_MASTER,SPI_SUB_MODE_1,
+					 (SPI_HW_CTRL_CS   |
+					  SPI_4PIN_MODE    |
+					  SPI_TURBO_ON    |
+					  SPI_CS_ACTIVELOW |
+					  SPI_WL_8));
 
+/*	MAP_SPIConfigSetExpClk(GSPI_BASE,MAP_PRCMPeripheralClockGet(PRCM_GSPI),
+						 SPI_IF_BIT_RATE,SPI_MODE_MASTER,SPI_SUB_MODE_0,
+						 (SPI_3PIN_MODE |
+						  SPI_TURBO_OFF |
+						  SPI_WL_8));*/
 	//
 	// Enable SPI for communication
 	//

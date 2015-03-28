@@ -9,6 +9,7 @@
 #include "network.h"
 #include "pwm.h"
 #include "target.h"
+#include "servos.h"
 
 //Driverlib includes
 #include "hw_types.h"
@@ -76,11 +77,9 @@ int main(void) {
 		_SlNonOsMainLoopTask();
 		//TargetMainLoopTask();
 
-		if(pulse_us == 2200)
-			pulse_us = 800;
-
-		 UpdateDutyCycle(TIMERA2_BASE, TIMER_B, pulse_us++);
+		 SetPitchAngle(0);
 		 printf("%d\n", pulse_us);
-		 MAP_UtilsDelay(80000);
+		 MAP_UtilsDelay(800000);
+
 	}
 }

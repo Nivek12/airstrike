@@ -28,20 +28,13 @@ char* getFaggotBlocksForKevinTheFag(char * faggotString) {
 uint8_t TargetMainLoopTask(void)
 {
 	uint16_t numBlocks = 0;
+
 	g_CameraSelect = CAM_A;
-
 	g_numBlocks = getBlocks(MAX_BLOCKS);
-
-	printf("%d\n", g_numBlocks);
-
-
 	//g_CameraSelect = CAM_B;
+	//g_numBlocks = getBlocks(MAX_BLOCKS);
 
-	//puts("\nGetting CAM B Data\n");
-
-	//numBlocks = getBlocks(MAX_BLOCKS);
-
-	return numBlocks;
+	return g_numBlocks;
 }
 
 

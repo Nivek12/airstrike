@@ -9,6 +9,7 @@
 
 Block *g_blocks;
 uint8_t g_numBlocks;
+int g_skipStart = 0;
 
 #ifndef SPI //////////// for I2C and UART
 
@@ -66,7 +67,7 @@ uint16_t getWord()
   w |= c;
 
   disablePixyCS(g_CameraSelect);
-
+  printf("CAM says: %4X\n", w);
 
   return w;
 }

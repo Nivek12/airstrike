@@ -24,14 +24,14 @@
 // Are you using an SPI interface?  if so, uncomment this line
 #define SPI
 
-#define PIXY_ARRAYSIZE              100
+#define PIXY_ARRAYSIZE              20
 #define PIXY_START_WORD             0xaa55
 #define PIXY_START_WORD_CC          0xaa56
 #define PIXY_START_WORDX            0x55aa
 #define PIXY_SERVO_SYNC             0xff
 #define PIXY_CAM_BRIGHTNESS_SYNC    0xfe
 #define PIXY_LED_SYNC               0xfd
-#define PIXY_OUTBUF_SIZE            64
+#define PIXY_OUTBUF_SIZE            32
 
 #define PIXY_SYNC_BYTE              0x5a
 #define PIXY_SYNC_BYTE_DATA         0x5b
@@ -78,7 +78,7 @@ int pxy_send(uint8_t *data, int len);
 
 #endif //////////////// end SPI routines
 
-static int g_skipStart = 0;
+extern int g_skipStart;
 static BlockType g_blockType;
 extern Block *g_blocks;
 extern uint8_t g_numBlocks;
