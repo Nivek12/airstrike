@@ -10,16 +10,12 @@
 uint8_t g_CameraSelect = CAM_A;
 
 uint8_t getByte(uint8_t out) {
-	unsigned long w = 0;
+	uint8_t w = 0;
 
-	MAP_SPIDataPut(GSPI_BASE, out);
-	MAP_SPIDataGet(GSPI_BASE, &w);
+	SPITransfer(GSPI_BASE, &out, &w, 1, 0);
 
-	uint8_t r = 0;
-
-	r |= ((w) & 0xFF);
-
-	return r;
+	 printf("CAM %d says: %2X, %d\n", g_CameraSelect, w, w);
+	return w;
 }
 
 void enablePixyCS(uint8_t cam) {

@@ -27,12 +27,17 @@ char* getFaggotBlocksForKevinTheFag(char * faggotString) {
 
 uint8_t TargetMainLoopTask(void)
 {
-	uint16_t numBlocks = 0;
-
-	g_CameraSelect = CAM_A;
-	g_numBlocks = getBlocks(MAX_BLOCKS);
-	//g_CameraSelect = CAM_B;
+	//uint16_t numBlocks = 0;
+	//g_skipStart = 0;
+	//g_CameraSelect = CAM_A;
+	//enablePixyCS(g_CameraSelect);
 	//g_numBlocks = getBlocks(MAX_BLOCKS);
+	//disablePixyCS(g_CameraSelect);
+	g_skipStart = 0;
+	g_CameraSelect = CAM_B;
+	//enablePixyCS(g_CameraSelect);
+	g_numBlocks = getBlocks(MAX_BLOCKS);
+	//disablePixyCS(g_CameraSelect);
 
 	return g_numBlocks;
 }

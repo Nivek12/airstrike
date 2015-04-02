@@ -61,13 +61,15 @@ uint16_t getWord()
       g_outReadIndex = 0;
   }
   else
-  w = getByte(PIXY_SYNC_BYTE); // send out sync byte
+  {
+	  w = getByte(PIXY_SYNC_BYTE); // send out sync byte
+  }
   w <<= 8;
   c = getByte(cout); // send out data byte
   w |= c;
 
   disablePixyCS(g_CameraSelect);
-  printf("CAM says: %4X\n", w);
+  //printf("CAM %d says: %4X, %d\n", g_CameraSelect, w, w);
 
   return w;
 }
@@ -120,11 +122,16 @@ int getStart(void)
       return 1;
     }
     else if (w==PIXY_START_WORDX)
-#ifdef SPI
+    {
+    	printf("\nSYNC ERROR\n\n");
+    }
+    	/*#ifdef SPI
+      enablePixyCS(g_CameraSelect);
       getByte(0); // we're out of sync! (backwards)
+      disablePixyCS(g_CameraSelect);
 #else
       getByte(); // we're out of sync! (backwards)
-#endif
+#endif*/
     lastw = w;
   }
 }

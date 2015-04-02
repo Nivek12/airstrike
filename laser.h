@@ -11,6 +11,10 @@
 #include "pwm.h"
 
 //percent is a value between 0 and 1
-void setLaserPower(float percent);
+void SetLaserPower(float percent);
+
+float GetLaserPower();
+
+extern float g_LaserPowerLevel;
 
 #endif /* LASER_H_ */

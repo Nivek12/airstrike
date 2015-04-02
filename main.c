@@ -76,11 +76,11 @@ int main(void) {
 	while(1)
 	{
 		_SlNonOsMainLoopTask();
-		//TargetMainLoopTask();
+		TargetMainLoopTask();
 
-		 SetPitchAngle(0);
-		 printf("%d\n", pulse_us);
-		 MAP_UtilsDelay(800000);
+//		 SetPitchAngle(0);
+//		 printf("%d\n", pulse_us);
+//		 MAP_UtilsDelay(800000);
 
 	}
 }
