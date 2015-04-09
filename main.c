@@ -71,16 +71,22 @@ int main(void) {
 	InitTargetModule();
 	HTTPServerInit();
 
-	uint16_t pulse_us = 800;
+	float servo_angles[3];
 
 	while(1)
 	{
 		_SlNonOsMainLoopTask();
 		TargetMainLoopTask();
 
-//		 SetPitchAngle(0);
-//		 printf("%d\n", pulse_us);
-//		 MAP_UtilsDelay(800000);
+		getServoAngles(servo_angles);
+		printf("Servo-Angles  Yaw: %5f, Pitch: %5f\n\n", servo_angles[2], servo_angles[1]);
+		if( foundTarget()){
+			//SetPitchAngle(servo_angles[1]-10);
+			//SetYawAngle(servo_angles[2]);
+		}
 
+		SetLaserPower(0.99);
+		SetPitchAngle(0);
+		SetYawAngle(0);
 	}
 }

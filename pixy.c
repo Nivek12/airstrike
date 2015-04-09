@@ -42,15 +42,12 @@ int pxy_send(uint8_t *data, int len)
 // SPI sends as it receives so we need a getByte routine that
 // takes an output data argument
 //uint8_t getByte(uint8_t out);
-
-
 uint16_t getWord()
 {
+
   // ordering is big endian because Pixy is sending 16 bits through SPI
   uint16_t w;
   uint8_t c, cout = 0;
-
-  enablePixyCS(g_CameraSelect);
 
   if (g_outLen)
   {
@@ -67,10 +64,6 @@ uint16_t getWord()
   w <<= 8;
   c = getByte(cout); // send out data byte
   w |= c;
-
-  disablePixyCS(g_CameraSelect);
-  //printf("CAM %d says: %4X, %d\n", g_CameraSelect, w, w);
-
   return w;
 }
 
@@ -125,13 +118,11 @@ int getStart(void)
     {
     	printf("\nSYNC ERROR\n\n");
     }
-    	/*#ifdef SPI
-      enablePixyCS(g_CameraSelect);
-      getByte(0); // we're out of sync! (backwards)
-      disablePixyCS(g_CameraSelect);
-#else
-      getByte(); // we're out of sync! (backwards)
-#endif*/
+//#ifdef SPI
+//      getByte(0); // we're out of sync! (backwards)
+//#else
+//      getByte(); // we're out of sync! (backwards)
+//#endif
     lastw = w;
   }
 }

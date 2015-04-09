@@ -104,7 +104,7 @@ void SimpleLinkHttpServerCallback(SlHttpServerEvent_t *pSlHttpServerEvent,
 
 				if(foundTarget())
 				{
-					getFaggotBlocksForKevinTheFag(message);
+					getTargetString(message);
 				}
 				else
 				{

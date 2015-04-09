@@ -14,16 +14,20 @@
 
 //2ms = 25.5
 //1ms = 12.75
+
+//Pitch pin 64 pwm 05
 void SetPitchAngle(float degrees)
 {
-	int width = DegreesToWidth(degrees);
+	int width = DegreesToWidth(-degrees);
 	UpdateDutyCycle(TIMERA2_BASE, TIMER_B, width);
 }
 
+//Yaw pin 1 pwm 06
 void SetYawAngle(float degrees)
 {
 	int width = DegreesToWidth(degrees);
 	UpdateDutyCycle(TIMERA3_BASE, TIMER_A, width);
+	//("%d\n", width);
 }
 
 int DegreesToWidth(float degrees)
