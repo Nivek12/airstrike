@@ -3,6 +3,8 @@
  *
  */
 
+#define TRACK_TIMER_INT_MSEC	10
+
 #include <stdio.h>
 
 // Subsystem includes
@@ -20,6 +22,11 @@
 #include "rom_map.h"
 #include "interrupt.h"
 #include "prcm.h"
+
+//Interface includes
+#include "timer_if.h"
+
+#include "HttpCore.h"
 
 //PinMux include
 #include "pin_mux_config.h"
@@ -60,6 +67,47 @@ static void BoardInit(void)
 	  PRCMCC3200MCUInit();
 }
 
+void TimerBaseA0IntHandler(void)
+{
+	TargetMainLoopTask();
+
+	//SetPitchAngle(0);
+	//SetYawAngle(0);
+
+	if (foundTarget())
+	{
+		float servo_angles[3];
+		getServoAngles(servo_angles);
+		//printf("Servo-Angles  Yaw: %5f, Pitch: %5f\n\n", servo_angles[2], servo_angles[1]);
+		SetPitchAngle(servo_angles[1]);
+		SetYawAngle(servo_angles[2]);
+	}
+	else
+	{
+		SetPitchAngle(0);
+		SetYawAngle(0);
+	}
+
+	if (onTarget())
+	{
+		SetLaserPower(0.9);
+	}
+	else
+	{
+		SetLaserPower(0);
+	}
+
+	printf("WE TRIED!\n");
+	Timer_IF_InterruptClear(TIMERA0_BASE);
+}
+
+void StartTrackTimer()
+{
+	Timer_IF_Init(PRCM_TIMERA0, TIMERA0_BASE, TIMER_CFG_PERIODIC, TIMER_BOTH, 0);
+	Timer_IF_IntSetup(TIMERA0_BASE, TIMER_BOTH, TimerBaseA0IntHandler);
+	Timer_IF_Start(TIMERA0_BASE, TIMER_BOTH, TRACK_TIMER_INT_MSEC);
+}
+
 /*
  * main.c
  */
@@ -70,23 +118,24 @@ int main(void) {
 	InitPWMModules();
 	InitTargetModule();
 	HTTPServerInit();
+	StartTrackTimer();
 
-	float servo_angles[3];
 
-	while(1)
+	while (1)
 	{
 		_SlNonOsMainLoopTask();
-		TargetMainLoopTask();
 
-		getServoAngles(servo_angles);
-		printf("Servo-Angles  Yaw: %5f, Pitch: %5f\n\n", servo_angles[2], servo_angles[1]);
-		if( foundTarget()){
-			//SetPitchAngle(servo_angles[1]-10);
-			//SetYawAngle(servo_angles[2]);
-		}
-
+		SetLaserPower(0);
+		MAP_UtilsDelay(8000000);
 		SetLaserPower(0.99);
-		SetPitchAngle(0);
-		SetYawAngle(0);
+		MAP_UtilsDelay(8000000);
+
+		//TargetMainLoopTask();
+
+//		SetLaserPower(0);
+//		SetPitchAngle(0);
+//		SetYawAngle(0);
 	}
+
+
 }

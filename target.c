@@ -5,33 +5,85 @@
  *      Author: Chris
  */
 #include "target.h"
-#define M_PI 3.14159265358979323846
-#define RANGE 1000000
-#define PIXY_PIXEL_AZ 75/320
-#define PIXY_PIXEL_EL 47/200
-#define PIXY_PIXEL_WIDTH  320
-#define PIXY_PIXEL_HEIGHT 200
-#define S2P_X 0
-#define S2P_Y 0
-#define S2P_Z 0
 
-Block g_target = {0, 0, 0, 0, 0, 0};
+Target_Track g_target;
 uint16_t c_triesSinceLastDet = 10;
+uint16_t last_coor[2];
 
 bool foundTarget(void) {
-	return (c_triesSinceLastDet < 5);
+	return (g_target.viableFrames > 1);
+}
+
+bool onTarget(void) {
+
+	if (g_target.viableFrames < 2) return false;
+
+	uint8_t frame =  (g_target.start + g_target.viableFrames - 1)%TRACKFRAMES;
+	uint8_t lframe = (g_target.start + g_target.viableFrames - 2)%TRACKFRAMES;
+	float p;
+
+	p = findTargetChangePercent(g_target.coordinates[lframe][0], g_target.coordinates[lframe][1],
+			g_target.coordinates[frame][0], g_target.coordinates[frame][1]);
+
+	printf("Percent from target: %f\n", p);
+
+	if (p > LASER_TOL)
+		return false;
+	else
+		return true;
+}
+
+float findTargetChangePercent(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
+	float p = 0.0, dx = 0.0, dy = 0.0, dr = 0.0, dc = 0.0;
+
+	dx = x1 - x0;
+	dy = y1 - y0;
+	dr = sqrt(dx*dx + dy*dy);
+	dc = sqrt(PIXY_PIXEL_WIDTH*PIXY_PIXEL_WIDTH +
+		 PIXY_PIXEL_HEIGHT*PIXY_PIXEL_HEIGHT);
+	p  = dr/dc * 100;
+
+	printf("dr, dc: %f, %f\np: %f\n", dr, dc, p);
+	return p;
 }
 
 void InitTargetModule(void) {
 	InitSPIModule();
 	init();
+	uint8_t i = 0, j = 0;
 
+	for (i = 0; i < 5; i++)
+	{
+		for (j = 0; j < 4; j++)
+		{
+			g_target.coordinates[i][j] = 0;
+		}
+	}
+
+	g_target.start = 0;
+	g_target.viableFrames = 0;
+
+	last_coor[0] = 0;
+	last_coor[1] = 0;
+}
+
+void getCurTarget(Block* tar) {
+	uint8_t frame = (g_target.start + g_target.viableFrames - 1)%TRACKFRAMES;
+	tar->x = g_target.coordinates[frame][0];
+	tar->y = g_target.coordinates[frame][1];
+	tar->height = g_target.coordinates[frame][2];
+	tar->width = g_target.coordinates[frame][3];
+	tar->signature = 0;
+	tar->angle = 0;
 }
 
 char* getTargetString(char * targetString) {
+	Block target;
+	getCurTarget(&target);
 	sprintf(targetString, "%u|%u|%u|%u",
-			(unsigned int) g_target.x, (unsigned int) g_target.y,
-			(unsigned int) g_target.height, (unsigned int) g_target.width);
+			(unsigned int) target.x, (unsigned int) target.y,
+			(unsigned int) target.height, (unsigned int) target.width);
 	return targetString;
 }
 
@@ -40,21 +92,40 @@ uint8_t TargetMainLoopTask(void)
 	g_numBlocks = getBlocks(MAX_BLOCKS);
 	if (g_numBlocks > 0)
 	{
-		g_target = g_blocks[0];
+		updateTarget();
 		c_triesSinceLastDet = 0;
-	} else
+	}
+	else
 	{
 		c_triesSinceLastDet++;
+		if (c_triesSinceLastDet > 5)
+		{
+			g_target.viableFrames = 0;
+		}
 	}
+
+	printf("%d\n", g_numBlocks);
 	return g_numBlocks;
 }
 
 float* getTargetSphericalCoords(float* target_coords)
 {
 	target_coords[0] = RANGE;
+	Block t_target;
+	getCurTarget(&t_target);
 
-	float p_x = g_target.x    - (PIXY_PIXEL_WIDTH/2);
-	float p_y = (-g_target.y) + (PIXY_PIXEL_HEIGHT/2);
+	unsigned int currentCycles = MAP_TimerValueGet(TIMERA2_BASE, TIMER_B);
+	unsigned int cyclesRemaining = 0x00186A00 - currentCycles;
+	float timeRemaining = (cyclesRemaining/80000000)/1000;
+
+	t_target.x += g_target.vel[0] * timeRemaining;
+	t_target.y += g_target.vel[1] * timeRemaining;
+
+	last_coor[0] = t_target.x;
+	last_coor[1] = t_target.y;
+
+	float p_x = t_target.x    - (PIXY_PIXEL_WIDTH/2);
+	float p_y = (-t_target.y) + (PIXY_PIXEL_HEIGHT/2);
 
 	//printf("Pixy Pre-00   X: %5u,   Y: %5u\n" , g_target.x, g_target.y);
 	//printf("Pixy Pixels   X: %5f,   Y: %5f\n", p_x, p_y);
@@ -110,5 +181,29 @@ float* getServoAngles(float *servo_s_coords)
 	return servo_s_coords;
 }
 
+void updateTarget() {
+	Block targetUpdate = g_blocks[0];
+	uint8_t frame = (g_target.start + g_target.viableFrames)%TRACKFRAMES;
+	uint8_t lframe = (g_target.start + g_target.viableFrames - 1)%TRACKFRAMES;
+	g_target.coordinates[frame][0] = targetUpdate.x;
+	g_target.coordinates[frame][1] = targetUpdate.y;
+	g_target.coordinates[frame][2] = targetUpdate.height;
+	g_target.coordinates[frame][3] = targetUpdate.width;
 
+	if (g_target.viableFrames == TRACKFRAMES)
+	{
+		g_target.start = (g_target.start+1)%TRACKFRAMES;
+	}
+	else
+	{
+		g_target.viableFrames++;
+	}
+
+
+	if (g_target.viableFrames >= VELFRAMES)
+	{
+		g_target.vel[0] = (g_target.coordinates[frame][0] - g_target.coordinates[lframe][0])/(MS_PER_FRAME * (c_triesSinceLastDet + 1));
+		g_target.vel[1] = (g_target.coordinates[frame][1] - g_target.coordinates[lframe][1])/(MS_PER_FRAME * (c_triesSinceLastDet + 1));
+	}
+}
 

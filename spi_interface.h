@@ -21,7 +21,7 @@
 #include "rom_map.h"
 #include "spi.h"
 
-#define SPI_IF_BIT_RATE  1000000
+#define SPI_IF_BIT_RATE  10000000
 #define MAX_BLOCKS       100
 #define CAM_A            0
 #define CAM_B            1

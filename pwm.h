@@ -22,7 +22,7 @@
 #include "prcm.h"
 
 void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer, unsigned int pulse_ms);
-void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer, unsigned long ulConfig, unsigned char ucInvert);
+void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer, unsigned long ulConfig, unsigned char ucInvert, unsigned int refreshRate);
 void InitPWMModules();
 
 #endif /* PWM_H_ */

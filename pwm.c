@@ -31,8 +31,8 @@
 #define CC3200_CLOCK_RATE 	80000000
 #define TICS_US 			CC3200_CLOCK_RATE / 1000000
 #define DEFAULT_PULSE 		0
-#define REFRESH_RATE 		50 //For 20ms periods = 50Hz
-
+#define SERVO_REFRESH_RATE 	50	//20ms periods = 50Hz
+#define LASER_REFRESH_RATE	50
 
 //****************************************************************************
 //
@@ -77,13 +77,13 @@ void UpdateDutyCycle(unsigned long ulBase, unsigned long ulTimer, unsigned int p
 //
 //****************************************************************************
 void SetupTimerPWMMode(unsigned long ulBase, unsigned long ulTimer,
-                       unsigned long ulConfig, unsigned char ucInvert)
+                       unsigned long ulConfig, unsigned char ucInvert, unsigned int refreshRate)
 {
 
 
 
     // set refresh rate
-    uint32_t period1 = CC3200_CLOCK_RATE / REFRESH_RATE; /*Hz*/
+    uint32_t period1 = CC3200_CLOCK_RATE / refreshRate; /*Hz*/
     uint8_t extender1 = period1 >> 16;
     period1 &= 0xFFFF;
 
@@ -139,21 +139,21 @@ void InitPWMModules()
     MAP_PRCMPeripheralClkEnable(PRCM_TIMERA3, PRCM_RUN_MODE_CLK);
 
     //
-    // TIMERA2 (TIMER B) as RED of RGB light. GPIO 9 --> PWM_5
+    // TIMERA2 (TIMER B) as Pitch Servo. GPIO 9 --> PWM_5
     //
     SetupTimerPWMMode(TIMERA2_BASE, TIMER_B,
-            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PWM), 1);
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_B_PWM), 1, SERVO_REFRESH_RATE);
 
     //
-    // TIMERA3 (TIMER B) as YELLOW of RGB light. GPIO 10 --> PWM_6
+    // TIMERA3 (TIMER B) as Yaw Servo. GPIO 10 --> PWM_6
     //
     SetupTimerPWMMode(TIMERA3_BASE, TIMER_A,
-            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1, SERVO_REFRESH_RATE);
     //
-    // TIMERA3 (TIMER A) as GREEN of RGB light. GPIO 11 --> PWM_7
+    // TIMERA3 (TIMER A) as Laser control. GPIO 11 --> PWM_7
     //
     SetupTimerPWMMode(TIMERA3_BASE, TIMER_B,
-            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1);
+            (TIMER_CFG_SPLIT_PAIR | TIMER_CFG_A_PWM | TIMER_CFG_B_PWM), 1, LASER_REFRESH_RATE);
 
     MAP_TimerEnable(TIMERA2_BASE,TIMER_B);
     MAP_TimerEnable(TIMERA3_BASE,TIMER_A);
